@@ -1,67 +1,98 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="de">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Crewparty – Countdown</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Crewparty Countdown</title>
+
 <style>
-  *{box-sizing:border-box}
-  body{margin:0;min-height:100vh;font-family:Arial,Helvetica,sans-serif;
-       background:linear-gradient(135deg,#fff7bf,#f4f7f1 45%,#d9f0d0);
-       display:flex;align-items:center;justify-content:center;padding:24px;color:#172018}
-  .card{width:min(760px,100%);background:white;border-radius:28px;padding:34px 26px;
-        box-shadow:0 16px 50px rgba(0,0,0,.15);text-align:center}
-  h1{font-size:clamp(42px,9vw,78px);margin:0 0 4px;font-weight:900;letter-spacing:-2px}
-  .subtitle{font-size:clamp(22px,4vw,34px);font-weight:800;margin:0 0 22px}
-  .where{font-size:18px;margin:8px 0 26px}
-  .timer{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin:18px 0 24px}
-  .unit{background:#172018;color:white;border-radius:18px;padding:18px 8px}
-  .num{font-size:clamp(38px,8vw,68px);font-weight:900;line-height:1}
-  .label{font-size:13px;text-transform:uppercase;letter-spacing:1.5px;margin-top:7px}
-  .info{font-size:17px;line-height:1.5;margin:16px 0}
-  a{display:inline-block;margin-top:10px;padding:14px 20px;border-radius:14px;
-    background:#f5d400;color:#172018;text-decoration:none;font-weight:800}
-  .done{font-size:42px;font-weight:900;margin:25px 0}
+    body {
+        font-family: Arial, sans-serif;
+        background: #f7f7f7;
+        text-align: center;
+        padding: 40px;
+        color: #333;
+    }
+
+    h1 {
+        font-size: 2.2rem;
+        margin-bottom: 20px;
+        color: #e63946;
+    }
+
+    #countdown {
+        font-size: 2rem;
+        font-weight: bold;
+        margin-top: 20px;
+        padding: 20px;
+        background: #fff;
+        display: inline-block;
+        border-radius: 12px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+    }
+
+    /* Fade-In Effekt */
+    .fade-in {
+        opacity: 0;
+        animation: fadeIn 2s forwards;
+    }
+
+    @keyframes fadeIn {
+        from { opacity: 0; }
+        to { opacity: 1; }
+    }
+
+    #afterText {
+        font-size: 1.6rem;
+        font-weight: bold;
+        margin-top: 30px;
+        color: #1d3557;
+        display: none;
+    }
 </style>
 </head>
+
 <body>
-<div class="card">
-  <h1>🎉 CREWPARTY</h1>
-  <div class="subtitle">Morgen ab 15:30 Uhr!</div>
-  <div class="where">📍 Matea’s Garten am Struckbachteich</div>
 
-  <div id="timer" class="timer">
-    <div class="unit"><div id="hours" class="num">--</div><div class="label">Stunden</div></div>
-    <div class="unit"><div id="minutes" class="num">--</div><div class="label">Minuten</div></div>
-    <div class="unit"><div id="seconds" class="num">--</div><div class="label">Sekunden</div></div>
-  </div>
+<h1>Countdown zur Crewparty 🎉</h1>
 
-  <div id="message" class="info">🔥 Grillgut · 🥗 Salate & Snacks · ⚽ Ballspiele</div>
-  <a href="https://goo.gl/maps/Q6YPZM5z59HqxndG7" target="_blank" rel="noopener">📍 Weg zu Matea’s Garten</a>
+<div id="countdown"></div>
+
+<div id="afterText" class="fade-in">
+    Die Party ist im Gange, du bist aber herzlich eingeladen auch jetzt noch dazuzustoßen!
 </div>
 
 <script>
-const target = new Date("2026-09-09T15:30:00+02:00").getTime();
+    // Zielzeit: Mittwoch 15:30 Uhr
+    const targetDate = new Date();
+    targetDate.setHours(15, 30, 0, 0);
 
-function update() {
-  const diff = target - Date.now();
-  if (diff <= 0) {
-    document.getElementById("timer").innerHTML =
-      '<div class="done" style="grid-column:1/-1">🎉 JETZT GEHT’S LOS! 🎉</div>';
-    document.getElementById("message").textContent =
-      "Wir freuen uns auf euch!";
-    return;
-  }
-  const totalSeconds = Math.floor(diff / 1000);
-  const h = Math.floor(totalSeconds / 3600);
-  const m = Math.floor((totalSeconds % 3600) / 60);
-  const s = totalSeconds % 60;
-  document.getElementById("hours").textContent = String(h).padStart(2,"0");
-  document.getElementById("minutes").textContent = String(m).padStart(2,"0");
-  document.getElementById("seconds").textContent = String(s).padStart(2,"0");
-}
-update();
-setInterval(update, 1000);
+    // Wenn heute schon nach 15:30 → nächsten Tag nehmen
+    if (new Date() > targetDate) {
+        targetDate.setDate(targetDate.getDate() + 1);
+    }
+
+    const x = setInterval(function() {
+        const now = new Date().getTime();
+        const distance = targetDate - now;
+
+        if (distance <= 0) {
+            clearInterval(x);
+            document.getElementById("countdown").style.display = "none";
+            document.getElementById("afterText").style.display = "block";
+            return;
+        }
+
+        const hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+        const minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+        const seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+        document.getElementById("countdown").innerHTML =
+            hours + " Stunden : " +
+            minutes + " Minuten : " +
+            seconds + " Sekunden";
+    }, 1000);
 </script>
+
 </body>
 </html>
